@@ -214,10 +214,7 @@ class PtraceProcess(object):
             stop = min(stop, start + MAX_CODE_SIZE - 1)
 
         if not HAS_DISASSEMBLER:
-            if stop is not None:
-                size = stop - start + 1
-            else:
-                size = MIN_CODE_SIZE
+            size = stop - start + 1 if stop is not None else MIN_CODE_SIZE
             code = self.readBytes(start, size)
             if RUNNING_PYTHON3:
                 text = " ".join("%02x" % byte for byte in code)
@@ -228,7 +225,7 @@ class PtraceProcess(object):
 
         if manage_bp:
             address = start
-            for line in range(10):
+            for _ in range(10):
                 bp = False
                 if address in self.breakpoints:
                     bytes = self.breakpoints[address].old_bytes
@@ -414,16 +411,15 @@ class PtraceProcess(object):
     def getregs(self):
         if HAS_PTRACE_GETREGS or HAS_PTRACE_GETREGSET:
             return ptrace_getregs(self.pid)
-        else:
-            # FIXME: Optimize getreg() when used with this function
-            words = []
-            nb_words = sizeof(ptrace_registers_t) // CPU_WORD_SIZE
-            for offset in range(nb_words):
-                word = ptrace_peekuser(self.pid, offset * CPU_WORD_SIZE)
-                bytes = word2bytes(word)
-                words.append(bytes)
-            bytes = ''.join(words)
-            return bytes2type(bytes, ptrace_registers_t)
+        # FIXME: Optimize getreg() when used with this function
+        words = []
+        nb_words = sizeof(ptrace_registers_t) // CPU_WORD_SIZE
+        for offset in range(nb_words):
+            word = ptrace_peekuser(self.pid, offset * CPU_WORD_SIZE)
+            bytes = word2bytes(word)
+            words.append(bytes)
+        bytes = ''.join(words)
+        return bytes2type(bytes, ptrace_registers_t)
 
     def getreg(self, name):
         try:
@@ -536,8 +532,7 @@ class PtraceProcess(object):
 
     def readWord(self, address):
         """Address have to be aligned!"""
-        word = ptrace_peektext(self.pid, address)
-        return word
+        return ptrace_peektext(self.pid, address)
 
     if HAS_PTRACE_IO:
         def readBytes(self, address, size):

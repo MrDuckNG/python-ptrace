@@ -6,16 +6,14 @@ def getLogFunc(logger, level):
     """
     Get the logger function for the specified logging level.
     """
-    if level == ERROR:
+    if level == ERROR or level not in [WARNING, INFO, DEBUG]:
         return logger.error
     elif level == WARNING:
         return logger.warning
     elif level == INFO:
         return logger.info
-    elif level == DEBUG:
-        return logger.debug
     else:
-        return logger.error
+        return logger.debug
 
 
 def changeLogLevel(level, delta):

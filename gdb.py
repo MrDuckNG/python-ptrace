@@ -118,8 +118,7 @@ def getPointers(process, address):
     address = word2bytes(address)
     procmaps = readProcessMappings(process)
     for pm in procmaps:
-        for found in pm.search(address):
-            yield found
+        yield from pm.search(address)
 
 
 class Gdb(Application):
@@ -385,8 +384,7 @@ class Gdb(Application):
             return str(err)
         last_process = self.process
         try:
-            errmsg = self.cont(signum)
-            return errmsg
+            return self.cont(signum)
         finally:
             try:
                 del self.last_signal[last_process]
@@ -427,13 +425,12 @@ class Gdb(Application):
         dump.close()
 
     def hexdump(self, command):
-        max_line = 20
         width = (terminalWidth() - len(formatAddress(1)) - 3) // 4
         width = max(width, 1)
 
         limited = None
         parts = command.split(" ", 1)
-        if 1 < len(parts):
+        if len(parts) > 1:
             try:
                 start_address = self.parseInteger(parts[0])
                 end_address = self.parseInteger(parts[1])
@@ -443,6 +440,7 @@ class Gdb(Application):
             except ValueError as err:
                 return str(err)
             size = end_address - start_address
+            max_line = 20
             max_size = width * max_line
             if max_size < size:
                 limited = max_size
@@ -507,9 +505,9 @@ class Gdb(Application):
             values = self.parseIntegers(command)
         except ValueError as err:
             return str(err)
-        if 1 <= len(values):
+        if len(values) >= 1:
             start = values[0]
-        if 2 <= len(values):
+        if len(values) >= 2:
             stop = values[1]
         self.process.dumpCode(start, stop, manage_bp=manage_bp)
         return None
@@ -617,12 +615,11 @@ class Gdb(Application):
                 text = "%s = %s" % (syscall.format(), syscall.result_text)
                 if self.show_pid:
                     text = "Process %s exits %s" % (syscall.process.pid, text)
-                error(text)
             else:
                 text = syscall.format()
                 if self.show_pid:
                     text = "Process %s enters %s" % (syscall.process.pid, text)
-                error(text)
+            error(text)
         return None
 
     def until(self, command):
@@ -802,11 +799,10 @@ class Gdb(Application):
 
         # If command is empty, reuse previous command
         if not command:
-            if self.previous_command:
-                command = self.previous_command
-                info("Replay previous command: %s" % command)
-            else:
+            if not self.previous_command:
                 return False
+            command = self.previous_command
+            info("Replay previous command: %s" % command)
         self.previous_command = None
 
         # User wants to quit?
@@ -824,7 +820,6 @@ class Gdb(Application):
                 except Exception as err:
                     print("Command error: %s" % err)
                     raise
-                    ok = False
                 if not ok:
                     break
             if ok:

@@ -237,8 +237,8 @@ def getSystemBoot():
             getSystemBoot.value = btime
             break
         stat_file.close()
-        if getSystemBoot.value is None:
-            raise ProcError("Unable to read system boot time!")
+    if getSystemBoot.value is None:
+        raise ProcError("Unable to read system boot time!")
     return getSystemBoot.value
 
 

@@ -56,10 +56,7 @@ with open('README.rst') as fp:
     LONG_DESCRIPTION = fp.read()
 
 ptrace = load_source("version", path.join("ptrace", "version.py"))
-PACKAGES = {}
-for name in MODULES:
-    PACKAGES[name] = name.replace(".", "/")
-
+PACKAGES = {name: name.replace(".", "/") for name in MODULES}
 install_options = {
     "name": ptrace.PACKAGE,
     "version": ptrace.__version__,

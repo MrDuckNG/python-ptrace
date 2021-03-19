@@ -51,14 +51,14 @@ class FunctionCall(object):
         self.arguments = []
 
     def __getitem__(self, key):
-        if isinstance(key, str):
-            for arg in self.arguments:
-                if arg.name == key:
-                    return arg
-            raise KeyError("%r has no argument called %r" % (self, key))
-        else:
+        if not isinstance(key, str):
             # Integer key
             return self.arguments[key]
+
+        for arg in self.arguments:
+            if arg.name == key:
+                return arg
+        raise KeyError("%r has no argument called %r" % (self, key))
 
     def format(self):
         arguments = [arg.format() for arg in self.arguments]

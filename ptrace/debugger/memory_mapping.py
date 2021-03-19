@@ -72,18 +72,13 @@ class MemoryMapping(object):
         bytestr_len = len(bytestr)
         buf_len = 64 * 1024
 
-        if buf_len < bytestr_len:
-            buf_len = bytestr_len
+        buf_len = max(buf_len, bytestr_len)
 
         remaining = self.end - self.start
         covered = self.start
 
         while remaining >= bytestr_len:
-            if remaining > buf_len:
-                requested = buf_len
-            else:
-                requested = remaining
-
+            requested = min(remaining, buf_len)
             data = process.readBytes(covered, requested)
 
             if data == "":

@@ -145,10 +145,7 @@ class ProcessSignal(ProcessEvent):
                 if write and fault_address == dest_addr:
                     error_cls = InvalidWrite
             else:
-                if write:
-                    fault_address = (source_addr, dest_addr)
-                else:
-                    fault_address = (source_addr,)
+                fault_address = (source_addr, dest_addr) if write else (source_addr, )
         except PtraceError:
             registers = {}
         return error_cls(fault_address, size=size, instr=instr,

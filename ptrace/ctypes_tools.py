@@ -104,11 +104,7 @@ def uint2int32(value):
     -1
     """
     value = value & 0xffffffff
-    if value & 0x80000000:
-        v = value - 0x100000000
-    else:
-        v = value
-    return v
+    return value - 0x100000000 if value & 0x80000000 else value
 
 
 uint2int = uint2int32

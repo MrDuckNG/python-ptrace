@@ -31,7 +31,7 @@ KNOWN_STRUCTS = []
 if RUNNING_LINUX:
     KNOWN_STRUCTS.extend(
         (timeval, timespec, pollfd, rlimit, new_utsname, user_desc))
-KNOWN_STRUCTS = dict((struct.__name__, struct) for struct in KNOWN_STRUCTS)
+KNOWN_STRUCTS = {struct.__name__: struct for struct in KNOWN_STRUCTS}
 
 ARGUMENT_CALLBACK = {
     # Prototype: callback(argument) -> str
@@ -92,9 +92,8 @@ class SyscallArgument(FunctionArgument):
             callback = None
         if callback:
             return callback(self)
-        if syscall == "execve":
-            if name in ("argv", "envp"):
-                return self.readCStringArray(value)
+        if syscall == "execve" and name in ("argv", "envp"):
+            return self.readCStringArray(value)
         if syscall == "socketcall":
             if name == "call":
                 try:
@@ -192,9 +191,8 @@ class SyscallArgument(FunctionArgument):
 
     def readBits(self, address, count, format=str):
         bytes = self.function.process.readBytes(address, count // 8)
-        fd_set = [format(index)
+        return [format(index)
                   for index, bit in enumerate(iterBits(bytes)) if bit]
-        return fd_set
 
     def readCString(self, address):
         if address:

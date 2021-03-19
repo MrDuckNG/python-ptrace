@@ -123,10 +123,9 @@ def _createChild(arguments,
 def _execChild(arguments, no_stdout, env):
     if no_stdout:
         try:
-            null = open(devnull, 'wb')
-            dup2(null.fileno(), 1)
-            dup2(1, 2)
-            null.close()
+            with open(devnull, 'wb') as null:
+                dup2(null.fileno(), 1)
+                dup2(1, 2)
         except IOError:
             close(2)
             close(1)
