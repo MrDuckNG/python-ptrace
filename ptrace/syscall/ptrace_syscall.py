@@ -17,16 +17,9 @@ elif CPU_ARM32:
 elif CPU_AARCH64:
     SYSCALL_REGISTER = "r8"
 elif RUNNING_LINUX:
-    if CPU_X86_64:
-        SYSCALL_REGISTER = "orig_rax"
-    else:
-        SYSCALL_REGISTER = "orig_eax"
+    SYSCALL_REGISTER = "orig_rax" if CPU_X86_64 else "orig_eax"
 else:
-    if CPU_X86_64:
-        SYSCALL_REGISTER = "rax"
-    else:
-        SYSCALL_REGISTER = "eax"
-
+    SYSCALL_REGISTER = "rax" if CPU_X86_64 else "eax"
 if CPU_ARM32:
     RETURN_VALUE_REGISTER = "r0"
 elif CPU_AARCH64:

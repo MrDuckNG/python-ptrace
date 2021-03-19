@@ -11,10 +11,7 @@ elif CPU_X86_64:
     regex = '[ER][A-Z]{2}|[CDEFGS]S|[ABCD]L'
 else:
     regex = None
-if regex:
-    REGISTER_REGEX = re.compile(r'\b(?:%s)\b' % regex)
-else:
-    REGISTER_REGEX = None
+REGISTER_REGEX = re.compile(r'\b(?:%s)\b' % regex) if regex else None
 
 
 def extractRegisters(process, instr):
@@ -49,7 +46,7 @@ def findMappings(addresses, process, size):
         return mappings
     for address in addresses:
         address_str = formatAddress(address)
-        if 1 < size:
+        if size > 1:
             address_str += "..%s" % formatAddress(address + size - 1)
         found = False
         for map in process_mappings:

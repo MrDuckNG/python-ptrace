@@ -16,12 +16,7 @@ def ip_int2str(ip):
     return inet_ntoa(ip_bytes)
 
 
-if RUNNING_BSD:
-    sa_family_t = c_ubyte
-else:
-    sa_family_t = c_ushort
-
-
+sa_family_t = c_ubyte if RUNNING_BSD else c_ushort
 class sockaddr(Structure):
     if RUNNING_BSD:
         _fields_ = (

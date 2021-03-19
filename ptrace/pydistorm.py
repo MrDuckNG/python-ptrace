@@ -8,6 +8,7 @@ http://ragestorm.net/distorm/
 Python binding of diStorm64 library written by Victor Stinner
 """
 
+
 from ctypes import cdll, c_long, c_ulong, c_int, c_uint, c_char, POINTER, Structure, addressof, byref, c_void_p, create_string_buffer, sizeof, cast
 
 # Define (u)int32_t and (u)int64_t types
@@ -24,11 +25,7 @@ else:
     uint64_t = c_ulonglong
 
 SUPPORT_64BIT_OFFSET = True
-if SUPPORT_64BIT_OFFSET:
-    _OffsetType = uint64_t
-else:
-    _OffsetType = uint32_t
-
+_OffsetType = uint64_t if SUPPORT_64BIT_OFFSET else uint32_t
 LIB_FILENAME = 'libdistorm64.so'
 distorm = cdll.LoadLibrary(LIB_FILENAME)
 Decode16Bits = 0

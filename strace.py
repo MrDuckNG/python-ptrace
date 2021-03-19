@@ -136,9 +136,7 @@ class SyscallTracer(Application):
         name = syscall.name
         if self.only and (name not in self.only):
             return True
-        if self.ignore_regex and self.ignore_regex.match(name):
-            return True
-        return False
+        return bool(self.ignore_regex and self.ignore_regex.match(name))
 
     def displaySyscall(self, syscall):
         text = syscall.format()

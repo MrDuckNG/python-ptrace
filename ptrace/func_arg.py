@@ -76,10 +76,7 @@ class FunctionArgument(object):
             value = getattr(data, name)
             try:
                 text = self.formatStructValue(struct_name, name, value)
-                if text is not None:
-                    text = str(text)
-                else:
-                    text = repr(value)
+                text = str(text) if text is not None else repr(value)
             except PTRACE_ERRORS as err:
                 writeError(getLogger(), err, "Format struct value error")
                 text = repr(value)

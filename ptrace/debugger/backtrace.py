@@ -105,7 +105,7 @@ def getBacktraceFrame(process, ip, fp, nargs):
     frame = BacktraceFrame(ip)
     address = fp + CPU_WORD_SIZE
     try:
-        for index in range(nargs):
+        for _ in range(nargs):
             address += CPU_WORD_SIZE
             word = process.readWord(address)
             frame.arguments.append(word)

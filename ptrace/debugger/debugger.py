@@ -150,11 +150,10 @@ class PtraceDebugger(object):
             try:
                 pid, status = self._waitpid(wanted_pid, blocking)
             except OSError as err:
-                if err.errno == ECHILD:
-                    process = self.dict[wanted_pid]
-                    return process.processTerminated()
-                else:
+                if err.errno != ECHILD:
                     raise err
+                process = self.dict[wanted_pid]
+                return process.processTerminated()
             if not blocking and not pid:
                 return None
             try:
@@ -170,17 +169,17 @@ class PtraceDebugger(object):
         pause = 0.001
         while True:
             pids = tuple(self.dict)
-            if len(pids) > 1:
-                for pid in pids:
-                    process = self._wait_event_pid(pid, False)
-                    if process is not None:
-                        return process
-                if not blocking:
-                    return None
-                pause = min(pause * 2, 0.5)
-                sleep(pause)
-            else:
+            if len(pids) <= 1:
                 return self._wait_event_pid(pids[0], blocking)
+
+            for pid in pids:
+                process = self._wait_event_pid(pid, False)
+                if process is not None:
+                    return process
+            if not blocking:
+                return None
+            pause = min(pause * 2, 0.5)
+            sleep(pause)
 
     def waitProcessEvent(self, pid=None, blocking=True):
         """

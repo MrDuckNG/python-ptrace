@@ -34,9 +34,8 @@ def formatSockaddr(argument, argtype):
         return argument.readStruct(address, sockaddr_in6)
     if family == AF_FILE:
         return argument.readStruct(address, sockaddr_un)
-    if RUNNING_LINUX:
-        if family == AF_NETLINK:
-            return argument.readStruct(address, sockaddr_nl)
+    if RUNNING_LINUX and family == AF_NETLINK:
+        return argument.readStruct(address, sockaddr_nl)
     family = SOCKET_FAMILY.get(family, family)
     return argument.formatPointer("<sockaddr family=%s>" % family, address)
 

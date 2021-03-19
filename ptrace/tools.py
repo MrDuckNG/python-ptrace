@@ -149,7 +149,4 @@ def inverseDict(data):
     >>> inverseDict({"0x10": 16, "0x20": 32}) == {32: '0x20', 16: '0x10'}
     True
     """
-    result = {}
-    for key, value in data.items():
-        result[value] = key
-    return result
+    return {value: key for key, value in data.items()}
